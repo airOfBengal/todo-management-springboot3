@@ -6,17 +6,19 @@ import com.airofbengal.todo.mapper.TodoMapper;
 import com.airofbengal.todo.repository.TodoRepository;
 import com.airofbengal.todo.service.TodoService;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class TodoServiceImpl implements TodoService {
     private TodoRepository todoRepository;
+    private ModelMapper modelMapper;
 
     @Override
     public TodoDto addTodo(TodoDto todoDto) {
-        Todo todo = TodoMapper.mapToTodo(todoDto);
+        Todo todo = modelMapper.map(todoDto, Todo.class);
         Todo savedTodo = todoRepository.save(todo);
-        return TodoMapper.mapToTodoDto(savedTodo);
+        return modelMapper.map(savedTodo, TodoDto.class);
     }
 }
