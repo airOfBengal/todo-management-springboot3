@@ -1,5 +1,6 @@
 package com.airofbengal.todo.service.impl;
 
+import com.airofbengal.todo.dto.JwtAuthResponse;
 import com.airofbengal.todo.dto.LoginDto;
 import com.airofbengal.todo.dto.RegisterDto;
 import com.airofbengal.todo.entity.Role;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -56,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginDto loginDto) {
+    public JwtAuthResponse login(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(),
                 loginDto.getPassword()
@@ -64,6 +66,21 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
-        return token;
+
+        String role = null;
+        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(loginDto.getUsernameOrEmail(), loginDto.getUsernameOrEmail());
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            Optional<Role> optionalRole = user.getRoles().stream().findFirst();
+            if(optionalRole.isPresent()){
+                Role userRole = optionalRole.get();
+                role = userRole.getName();
+            }
+        }
+
+        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+        jwtAuthResponse.setAccessToken(token);
+        jwtAuthResponse.setRole(role);
+        return jwtAuthResponse;
     }
 }
