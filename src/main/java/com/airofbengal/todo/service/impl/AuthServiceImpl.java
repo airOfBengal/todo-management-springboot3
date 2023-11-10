@@ -7,6 +7,7 @@ import com.airofbengal.todo.entity.User;
 import com.airofbengal.todo.exception.TodoApiException;
 import com.airofbengal.todo.repository.RoleRepository;
 import com.airofbengal.todo.repository.UserRepository;
+import com.airofbengal.todo.security.JwtTokenProvider;
 import com.airofbengal.todo.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private AuthenticationManager authenticationManager;
+    private JwtTokenProvider tokenProvider;
 
     @Override
     public String register(RegisterDto registerDto) {
@@ -61,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         ));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "User logged-in successfully!";
+        String token = tokenProvider.generateToken(authentication);
+        return token;
     }
 }

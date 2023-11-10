@@ -1,16 +1,15 @@
 package com.airofbengal.todo.controller;
 
+import com.airofbengal.todo.dto.JwtAuthResponse;
 import com.airofbengal.todo.dto.LoginDto;
 import com.airofbengal.todo.dto.RegisterDto;
 import com.airofbengal.todo.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
@@ -24,8 +23,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
-        String response = authService.login(loginDto);
+    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto){
+        String token = authService.login(loginDto);
+        JwtAuthResponse response = new JwtAuthResponse();
+        response.setAccessToken(token);
         return ResponseEntity.ok(response);
     }
 }
